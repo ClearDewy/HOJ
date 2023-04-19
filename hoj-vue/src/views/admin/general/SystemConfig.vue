@@ -74,7 +74,7 @@
                 type="textarea"
                 :placeholder="$t('m.Web_Desc')"
                 v-model="websiteConfig.description"
-                maxlength="150"
+                maxlength="1000"
                 show-word-limit
               >
               </el-input>

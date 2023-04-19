@@ -138,27 +138,55 @@ export const JUDGE_STATUS_RESERVE={
 }
 
 export const PROBLEM_LEVEL={
-  '0':{
-    name:{
-      'zh-CN':'简单',
-      'en-US':'Easy',
-    },
-    color:'#19be6b'
-  },
   '1':{
     name:{
-      'zh-CN':'中等',
-      'en-US':'Mid',
+      'zh-CN':'未知',
+      'en-US':'Unkonwn',
     },
-    color:'#2d8cf0'
+    color:'#5f5f5f'
   },
   '2':{
     name:{
-      'zh-CN':'困难',
-      'en-US':'Hard',
+      'zh-CN':'入门',
+      'en-US':'Entry',
     },
-    color:'#ed3f14'
-  }
+    color:'#19be6b'
+  },
+  '3':{
+    name:{
+      'zh-CN':'普及',
+      'en-US':'Universal',
+    },
+    color:'#ffc116'
+  },
+  '4':{
+    name:{
+      'zh-CN':'提高',
+      'en-US':'Develop',
+    },
+    color:'#3498d8'
+  },
+  '5':{
+    name:{
+      'zh-CN':'铜牌',
+      'en-US':'BronzeMedal',
+    },
+    color:'#fe4c61'
+  },
+  '6':{
+    name:{
+      'zh-CN':'银牌',
+      'en-US':'SilverMedal',
+    },
+    color:'#9d3dcf'
+  },
+  '7':{
+    name:{
+      'zh-CN':'金牌',
+      'en-US':'GoldMedal',
+    },
+    color:'#0e1d69'
+  },
 }
 
 

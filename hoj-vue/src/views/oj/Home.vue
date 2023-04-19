@@ -353,8 +353,93 @@
             </el-col>
           </el-row>
         </el-card>
+        <el-card class="card-top">
+          <div slot="header" class="clearfix title">
+            <span class="home-title panel-title">
+              {{ websiteConfig.name }}
+            </span>
+          </div>
+          <el-row :gutter="20">
+            <span
+                style="line-height:25px"
+                v-html="websiteConfig.description"
+                v-katex
+                v-highlight
+            >
+              </span>
+          </el-row>
+        </el-card>
+        <el-card class="card-top">
+          <div slot="header" class="clearfix">
+            <span class="panel-title home-title">{{
+                $t('m.Other_OJ_Contest')
+              }}</span>
+          </div>
+          <vxe-table
+              border="inner"
+              highlight-hover-row
+              stripe
+              :loading="loading.recentOtherContestsLoading"
+              auto-resize
+              :data="otherContests"
+              @cell-click="goOtherOJContest"
+          >
+            <vxe-table-column
+                field="oj"
+                :title="$t('m.Recent_Contest')"
+                min-width="150"
+                show-overflow
+                header-align="center"
+            >
+              <template v-slot="{ row }">
+                <span>[{{ row.oj }}] {{ row.title }}</span>
+              </template>
+            </vxe-table-column>
+            <vxe-table-column
+                field="beginTime"
+                :title="$t('m.Contest_Time')"
+                show-overflow
+                min-width="150"
+                align="center"
+            >
+              <template v-slot="{ row }">
+                <span
+                >{{ row.beginTime | localtime }} ~
+                  {{ row.endTime | localtime }}</span
+                >
+              </template>
+            </vxe-table-column>
+          </vxe-table>
+        </el-card>
       </el-col>
     </el-row>
+    <footer>
+      <div class="mundb-footer">
+        <a
+            style="color:#939393"
+            :href="websiteConfig.recordUrl"
+            target="_blank"
+        >{{ websiteConfig.recordName }}</a
+        >
+        Deployed by ClearDewy in 2022
+        <span style="margin-left:10px">
+            <el-dropdown @command="changeWebLanguage" placement="top">
+              <span class="el-dropdown-link">
+                <i class="fa fa-globe" aria-hidden="true">
+                  {{ this.webLanguage == 'zh-CN' ? '简体中文' : 'English' }}</i
+                ><i class="el-icon-arrow-up el-icon--right"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown" style="padding: 10px 0;margin: 5px 0;">
+                <el-dropdown-item command="zh-CN" style="list-style: none;padding: 0 20px;margin: 0;">简体中文</el-dropdown-item>
+                <el-dropdown-item command="en-US" style="list-style: none;padding: 0 20px;margin: 0;">English</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </span>
+        <div style="width:300px;margin:0 auto; padding-top:5px;">
+          <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=42090202000531" style="display:inline-block;text-decoration:none;height:20px;line-height:20px;"><img src="http://www.beian.gov.cn/img/ghs.png" style="float:left;"/><p style="float:left;height:20px;line-height:20px;margin: 0px 0px 0px 5px; color:#939393;">鄂公网安备 42090202000531号</p></a>
+        </div>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -382,6 +467,7 @@ export default {
     return {
       interval: 5000,
       recentUpdatedProblems: [],
+      otherContests: [],
       recentUserACRecord: [],
       CONTEST_STATUS_REVERSE: {},
       CONTEST_TYPE_REVERSE: {},
@@ -389,6 +475,7 @@ export default {
       loading: {
         recent7ACRankLoading: false,
         recentUpdatedProblemsLoading: false,
+        recentOtherContestsLoading: false,
         recentContests: false,
       },
       carouselImgList: [
@@ -453,8 +540,27 @@ export default {
     this.getRecentContests();
     this.getRecent7ACRank();
     this.getRecentUpdatedProblemList();
+    this.getRecentOtherContests();
   },
   methods: {
+    getRecentOtherContests() {
+      this.loading.recentOtherContestsLoading = true;
+      api.getRecentOtherContests().then(
+          (res) => {
+            this.otherContests = res.data.data;
+            this.loading.recentOtherContestsLoading = false;
+          },
+          (err) => {
+            this.loading.recentOtherContestsLoading = false;
+          }
+      );
+    },
+    goOtherOJContest(event) {
+      window.open(event.row.url);
+    },
+    changeWebLanguage(language) {
+      this.$store.commit('changeWebLanguage', { language: language });
+    },
     getHomeCarousel() {
       api.getHomeCarousel().then((res) => {
         if (res.data.data != null && res.data.data.length > 0) {
@@ -542,6 +648,7 @@ export default {
   computed: {
     ...mapState(["websiteConfig"]),
     ...mapGetters(["isAuthenticated"]),
+    ...mapGetters(["webLanguage", "token"]),
   },
 };
 </script>

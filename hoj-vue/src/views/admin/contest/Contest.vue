@@ -644,6 +644,7 @@ export default {
         type: 0,
         pwd: "",
         sealRank: false,
+        openRank:true,
         sealRankTime: "", //封榜时间
         autoRealRank: true,
         auth: 0,

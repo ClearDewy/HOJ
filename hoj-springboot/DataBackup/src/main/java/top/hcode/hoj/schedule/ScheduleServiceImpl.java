@@ -182,7 +182,7 @@ public class ScheduleServiceImpl implements ScheduleService {
      * endTime: "2020-11-08T08:00:00Z",
      */
     @Scheduled(cron = "0 0 0/2 * * *")
-//    @Scheduled(cron = "0/5 * * * * *")
+//    @Scheduled(cron = "0 0/2 * * * *")
     @Override
     public void getOjContestsList() {
         // 待格式化的API，需要填充年月查询
@@ -221,6 +221,39 @@ public class ScheduleServiceImpl implements ScheduleService {
                 log.error("爬虫爬取Nowcoder比赛异常----------------------->{}", e.getMessage());
             }
         }
+
+        /**
+         * 获取codeforces上的比赛
+         */
+        String CodeforcesUrl = "https://codeforces.com/api/contest.list?gym=false";
+        try {
+            JSONObject data = JsoupUtils.getJsonFromConnection(JsoupUtils.getConnectionFromUrl(CodeforcesUrl, null, null));
+            JSONArray ContestArray=data.getJSONArray("result");
+//            System.out.println(ContestArray);
+            // 找到时间最近的一场比赛
+            for (int i=0;i<ContestArray.size();i++){
+                if (ContestArray.getJSONObject(i).getLong("relativeTimeSeconds")>0){
+                    for (int j=i-1;j>=0&&i-j<=5;j--){
+                        JSONObject contest = ContestArray.getJSONObject(j);
+                        if (contest.getLong("startTimeSeconds")*1000<dateTime.getTime())break;
+
+                        contestsList.add(MapUtil.builder(new HashMap<String,Object>())
+                                .put("oj","Codeforces")
+                                .put("url","https://codeforces.com/contest/"+contest.getStr("id"))
+                                .put("title",contest.getStr("name"))
+                                .put("beginTime", new Date(contest.getLong("startTimeSeconds")*1000))
+                                .put("endTime", new Date((contest.getLong("startTimeSeconds")+contest.getLong("durationSeconds"))*1000)).map()
+                        );
+                    }
+                    break;
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("爬虫爬取Codeforces比赛异常----------------------->{}", e.getMessage());
+        }
+
+
         // 把比赛列表按照开始时间排序，方便查看
         contestsList.sort((o1, o2) -> {
 
@@ -237,6 +270,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         // 增加log提示
         log.info("获取牛客API的比赛列表成功！共获取数据" + contestsList.size() + "条");
     }
+
 
 
     /**
